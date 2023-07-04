@@ -28,34 +28,32 @@ def get_all_tasks(request):
     return Response(serializer.data)
 
 
-@api_view(['GET'])
-def get_task(request, task_id):
-    try:
-        task = Task.objects.get(id=task_id)
-    except Task.DoesNotExist:
-        return Response(status=404)
-    serializer = TaskSerializer(task)
-    return Response(serializer.data)
+@api_view(['GET', 'PUT', 'DELETE'])
+def task(request, task_id):
 
-
-@api_view(['PUT'])
-def update_task(request, task_id):
-    try:
-        task = Task.objects.get(id=task_id)
-    except Task.DoesNotExist:
-        return Response(status=404)
-    serializer = TaskSerializer(task, data=request.data)
-    if serializer.is_valid():
-        serializer.save()
+    if request.method == 'GET':
+        try:
+            task = Task.objects.get(id=task_id)
+        except Task.DoesNotExist:
+            return Response(status=404)
+        serializer = TaskSerializer(task)
         return Response(serializer.data)
-    return Response(serializer.errors, status=400)
 
+    elif request.method == 'PUT':
+        try:
+            task = Task.objects.get(id=task_id)
+        except Task.DoesNotExist:
+            return Response(status=404)
+        serializer = TaskSerializer(task, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=400)
 
-@api_view(['DELETE'])
-def delete_task(request, task_id):
-    try:
-        task = Task.objects.get(id=task_id)
-    except Task.DoesNotExist:
-        return Response(status=404)
-    task.delete()
-    return Response(status=204)
+    elif request.method == 'DELETE':
+        try:
+            task = Task.objects.get(id=task_id)
+        except Task.DoesNotExist:
+            return Response(status=404)
+        task.delete()
+        return Response(status=204)
