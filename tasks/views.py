@@ -28,7 +28,7 @@ def get_all_tasks(request):
     return Response(serializer.data)
 
 
-@api_view(['GET', 'PUT', 'DELETE'])
+@api_view(['GET', 'PATCH', 'DELETE'])
 def task(request, task_id):
 
     if request.method == 'GET':
@@ -39,12 +39,12 @@ def task(request, task_id):
         serializer = TaskSerializer(task)
         return Response(serializer.data)
 
-    elif request.method == 'PUT':
+    elif request.method == 'PATCH':
         try:
             task = Task.objects.get(id=task_id)
         except Task.DoesNotExist:
             return Response(status=404)
-        serializer = TaskSerializer(task, data=request.data)
+        serializer = TaskSerializer(task, data=request.data, partial=True)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data)
